@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package miniprogram;
+
+service Miniprogram {
+    // 小程序获取授权
+    rpc Auth(Request) returns (Response) {}
+}
+
+
+message Request {
+    string code = 1;
+    string type = 2;    // 小程序类型 wechat alipay baidu
+}
+
+message Response {
+    string token = 1;
+    bool valid = 2;
+}

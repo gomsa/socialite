@@ -5,6 +5,9 @@ import (
 	"github.com/micro/go-log"
 	micro "github.com/micro/go-micro"
 	k8s "github.com/micro/kubernetes/go/micro"
+
+	"github.com/gomsa/socialite/hander"
+	mpPB "github.com/gomsa/socialite/proto/miniprogram"
 )
 
 func main() {
@@ -13,6 +16,9 @@ func main() {
 		micro.Version(Conf.Version),
 	)
 	srv.Init()
+
+	mpPB.RegisterMiniprogramHandler(srv.Server(), &hander.Miniprogram{})
+
 	// Run the server
 	if err := srv.Run(); err != nil {
 		log.Log(err)

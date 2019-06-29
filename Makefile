@@ -8,3 +8,4 @@ dev:
 
 build:
 	protoc -I . --go_out=plugins=micro:. proto/socialite/socialite.proto
+	protoc -I . --go_out=plugins=micro:. proto/miniprogram/miniprogram.proto
