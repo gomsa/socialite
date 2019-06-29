@@ -17,8 +17,8 @@ func NewMiniprogram(Type string) (mp Miniprogram, err error) {
 	switch Type {
 	case "wechat":
 		mp = &srv.Wechat{
-			AppId:  env.Getenv("MP_WECHAT_APPID", "wx15550c1a89d982c8"),
-			Secret: env.Getenv("MP_WECHAT_SECRET", "f9c11f183a5beb592ccd801298ff5533"),
+			AppId:  env.Getenv("MP_WECHAT_APPID", ""),
+			Secret: env.Getenv("MP_WECHAT_SECRET", ""),
 		}
 	default:
 		return mp, fmt.Errorf("未找 %s 小程序驱动", Type)
