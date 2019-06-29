@@ -7,8 +7,6 @@ import (
 	sdk "github.com/bigrocs/wechat"
 	"github.com/bigrocs/wechat/requests"
 	"github.com/bigrocs/wechat/responses"
-
-	"github.com/gomsa/socialite/service"
 )
 
 // Wechat 微信小程序
@@ -18,7 +16,7 @@ type Wechat struct {
 }
 
 // Code2Session 使用 code 换取 session
-func (srv *Wechat) Code2Session(code string) (res *service.ResponseMiniprogram, err error) {
+func (srv *Wechat) Code2Session(code string) (res *ResponseMiniprogram, err error) {
 	// 创建连接
 	client, err := srv.client()
 	if err != nil {
@@ -59,7 +57,7 @@ func (srv *Wechat) request(code string) (request *requests.CommonRequest) {
 }
 
 // response 返回数据处理
-func (srv *Wechat) response(response *responses.CommonResponse) (res *service.ResponseMiniprogram, err error) {
+func (srv *Wechat) response(response *responses.CommonResponse) (res *ResponseMiniprogram, err error) {
 	// res 返回请求
 	r := map[string]string{}
 	err = json.Unmarshal([]byte(response.GetHttpContentString()), &r)
