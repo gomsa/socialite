@@ -52,22 +52,24 @@ func (srv *Wechat) request(code string) (request *requests.CommonRequest) {
 	request = requests.NewCommonRequest()
 	request.Domain = "miniprogram"
 	request.ApiName = "auth.code2Session"
-	request.QueryParams["js_code"] = code
+	request.QueryParams = map[string]string{
+		"js_code": code,
+	}
 	return
 }
 
 // response 返回数据处理
 func (srv *Wechat) response(response *responses.CommonResponse) (res *Response, err error) {
 	// res 返回请求
-	r := map[string]string{}
+	r := map[string]interface{}{}
 	err = json.Unmarshal([]byte(response.GetHttpContentString()), &r)
 	if err != nil {
 		return res, err
 	}
-	if r["errcode"] != "0" {
-		return res, errors.New(r["errmsg"])
+	if r["errcode"].(float64) != 0 {
+		return res, errors.New(r["errmsg"].(string))
 	}
-	res.Openid = r["openid"]
-	res.Session = r["session_key"]
+	res.Openid = r["openid"].(string)
+	res.Session = r["session_key"].(string)
 	return res, err
 }
