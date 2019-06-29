@@ -16,7 +16,7 @@ type Wechat struct {
 }
 
 // Code2Session 使用 code 换取 session
-func (srv *Wechat) Code2Session(code string) (res *ResponseMiniprogram, err error) {
+func (srv *Wechat) Code2Session(code string) (res *Response, err error) {
 	// 创建连接
 	client, err := srv.client()
 	if err != nil {
@@ -57,7 +57,7 @@ func (srv *Wechat) request(code string) (request *requests.CommonRequest) {
 }
 
 // response 返回数据处理
-func (srv *Wechat) response(response *responses.CommonResponse) (res *ResponseMiniprogram, err error) {
+func (srv *Wechat) response(response *responses.CommonResponse) (res *Response, err error) {
 	// res 返回请求
 	r := map[string]string{}
 	err = json.Unmarshal([]byte(response.GetHttpContentString()), &r)

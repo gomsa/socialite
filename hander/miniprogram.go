@@ -17,7 +17,11 @@ type Miniprogram struct {
 // Auth 小程序登录授权
 func (srv *Miniprogram) Auth(ctx context.Context, req *pb.Request, res *pb.Response) (err error) {
 	// 选择小程序驱动
-	srv.Mp = service.NewMiniprogram(req.Type)
+	srv.Mp, err = service.NewMiniprogram(req.Type)
+	if err != nil {
+		log.Log(err)
+		return err
+	}
 	// 换取 session
 	mp, err := srv.Mp.Code2Session(req.Code)
 	if err != nil {

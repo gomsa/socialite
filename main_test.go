@@ -14,10 +14,10 @@ func TestAuth(t *testing.T) {
 	h := hander.Miniprogram{}
 	req := &mpPB.Request{
 		Code: `13954386521`,
-		Type: `register_verify`,
+		Type: `wechat`,
 	}
 	res := &mpPB.Response{}
-	err := h.tAuth(context.TODO(), req, res)
+	err := h.Auth(context.TODO(), req, res)
 	fmt.Println(req, res, err)
 	t.Log(req, res, err)
 }
