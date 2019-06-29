@@ -18,10 +18,11 @@ service Users {
 
 message User {
     string id = 1;
-    string openid = 2;
-    string session = 3;
-    string created_at = 9;
-    string updated_at = 10;
+    string origin = 2;
+    string openid = 3;
+    string session = 4;
+    string created_at = 5;
+    string updated_at = 6;
 }
 message ListQuery{
     int64 limit=1; //返回数量

@@ -5,13 +5,14 @@ import (
 	// 公共引入
 	"github.com/micro/go-log"
 
-	pb "github.com/gomsa/user-srv/proto/user"
+	pb "github.com/gomsa/socialite/proto/user"
 
 	"github.com/jinzhu/gorm"
 )
 
 //URepository 仓库接口
 type URepository interface {
+	Exist(user *pb.User) bool
 	Create(user *pb.User) (*pb.User, error)
 	Get(user *pb.User) (*pb.User, error)
 	List(req *pb.ListQuery) ([]*pb.User, error)
@@ -23,6 +24,24 @@ type URepository interface {
 // UserRepository 用户仓库
 type UserRepository struct {
 	DB *gorm.DB
+}
+
+// Exist 检测用户是否已经存在
+func (repo *UserRepository) Exist(user *pb.User) bool {
+	var count int
+	if user.Id != "" {
+		repo.DB.Model(&user).Where("id = ?", user.Id).Count(&count)
+		if count > 0 {
+			return true
+		}
+	}
+	if user.Origin != "" {
+		repo.DB.Model(&user).Where("origin = ?", user.Origin).Where("openid = ?", user.Openid).Count(&count)
+		if count > 0 {
+			return true
+		}
+	}
+	return false
 }
 
 // List 获取所有用户信息
@@ -49,14 +68,14 @@ func (repo *UserRepository) List(req *pb.ListQuery) (users []*pb.User, err error
 		sort = "created_at desc"
 	}
 	// 查询条件
-	if req.Username != "" {
-		db = db.Where("username like ?", "%"+req.Username+"%")
+	if req.Id != "" {
+		db = db.Where("id like ?", "%"+req.Id+"%")
 	}
-	if req.Mobile != "" {
-		db = db.Where("mobile like ?", "%"+req.Mobile+"%")
+	if req.Openid != "" {
+		db = db.Where("openid like ?", "%"+req.Openid+"%")
 	}
-	if req.Email != "" {
-		db = db.Where("email like ?", "%"+req.Email+"%")
+	if req.Session != "" {
+		db = db.Where("session like ?", "%"+req.Session+"%")
 	}
 	if err := db.Order(sort).Limit(limit).Offset(offset).Find(&users).Error; err != nil {
 		log.Log(err)
@@ -70,14 +89,14 @@ func (repo *UserRepository) Total(req *pb.ListQuery) (total int64, err error) {
 	users := []pb.User{}
 	db := repo.DB
 	// 查询条件
-	if req.Username != "" {
-		db = db.Where("username like ?", "%"+req.Username+"%")
+	if req.Id != "" {
+		db = db.Where("id like ?", "%"+req.Id+"%")
 	}
-	if req.Mobile != "" {
-		db = db.Where("mobile like ?", "%"+req.Mobile+"%")
+	if req.Openid != "" {
+		db = db.Where("openid like ?", "%"+req.Openid+"%")
 	}
-	if req.Email != "" {
-		db = db.Where("email like ?", "%"+req.Email+"%")
+	if req.Session != "" {
+		db = db.Where("session like ?", "%"+req.Session+"%")
 	}
 	if err := db.Find(&users).Count(&total).Error; err != nil {
 		log.Log(err)
@@ -93,18 +112,8 @@ func (repo *UserRepository) Get(user *pb.User) (*pb.User, error) {
 			return nil, err
 		}
 	}
-	if user.Username != "" {
-		if err := repo.DB.Model(&user).Where("username = ?", user.Username).Find(&user).Error; err != nil {
-			return nil, err
-		}
-	}
-	if user.Mobile != "" {
-		if err := repo.DB.Model(&user).Where("mobile = ?", user.Mobile).Find(&user).Error; err != nil {
-			return nil, err
-		}
-	}
-	if user.Email != "" {
-		if err := repo.DB.Model(&user).Where("email = ?", user.Email).Find(&user).Error; err != nil {
+	if user.Openid != "" {
+		if err := repo.DB.Model(&user).Where("origin = ?", user.Origin).Where("openid = ?", user.Openid).Find(&user).Error; err != nil {
 			return nil, err
 		}
 	}
@@ -144,7 +153,10 @@ func (repo *UserRepository) Update(user *pb.User) (bool, error) {
 
 // Delete 删除用户
 func (repo *UserRepository) Delete(user *pb.User) (bool, error) {
-	err := repo.DB.Delete(user).Error
+	id := &pb.User{
+		Id: user.Id,
+	}
+	err := repo.DB.Delete(id).Error
 	if err != nil {
 		log.Log(err)
 		return false, err
