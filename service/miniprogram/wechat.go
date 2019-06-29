@@ -3,6 +3,7 @@ package miniprogram
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	sdk "github.com/bigrocs/wechat"
 	"github.com/bigrocs/wechat/requests"
@@ -15,8 +16,17 @@ type Wechat struct {
 	Secret string
 }
 
+// WechatResponse 微信返回数据格式
+type WechatResponse struct {
+	Openid     string `json:"openid,omitempty"`
+	SessionKey string `json:"session_key,omitempty"`
+	Unionid    string `json:"unionid,omitempty"`
+	Errcode    int64  `json:"errcode,omitempty"`
+	Errmsg     string `json:"errmsg,omitempty"`
+}
+
 // Code2Session 使用 code 换取 session
-func (srv *Wechat) Code2Session(code string) (res *Response, err error) {
+func (srv *Wechat) Code2Session(code string) (res Response, err error) {
 	// 创建连接
 	client, err := srv.client()
 	if err != nil {
@@ -59,17 +69,18 @@ func (srv *Wechat) request(code string) (request *requests.CommonRequest) {
 }
 
 // response 返回数据处理
-func (srv *Wechat) response(response *responses.CommonResponse) (res *Response, err error) {
+func (srv *Wechat) response(response *responses.CommonResponse) (res Response, err error) {
 	// res 返回请求
-	r := map[string]interface{}{}
-	err = json.Unmarshal([]byte(response.GetHttpContentString()), &r)
+	r := &WechatResponse{}
+	err = json.Unmarshal([]byte(response.GetHttpContentString()), r)
 	if err != nil {
 		return res, err
 	}
-	if r["errcode"].(float64) != 0 {
-		return res, errors.New(r["errmsg"].(string))
+	fmt.Println(r)
+	if r.Errcode != 0 {
+		return res, errors.New(r.Errmsg)
 	}
-	res.Openid = r["openid"].(string)
-	res.Session = r["session_key"].(string)
+	res.Openid = r.Openid
+	res.Session = r.SessionKey
 	return res, err
 }

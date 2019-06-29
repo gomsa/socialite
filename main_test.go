@@ -13,7 +13,7 @@ func TestAuth(t *testing.T) {
 
 	h := hander.Miniprogram{}
 	req := &mpPB.Request{
-		Code: `13954386521`,
+		Code: `001tiGET1XmBs41UhpET1x3mET1tiGEs`,
 		Type: `wechat`,
 	}
 	res := &mpPB.Response{}

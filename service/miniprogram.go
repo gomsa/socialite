@@ -9,7 +9,7 @@ import (
 
 //Miniprogram 短信发送接口
 type Miniprogram interface {
-	Code2Session(string) (*srv.Response, error)
+	Code2Session(string) (srv.Response, error)
 }
 
 // NewMiniprogram 创建新的小程序服务
