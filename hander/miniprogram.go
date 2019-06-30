@@ -2,10 +2,13 @@ package hander
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/gomsa/user-srv/client"
+	userSrvPB "github.com/gomsa/user-srv/proto/user"
+	authSrvPB "github.com/gomsa/user-srv/proto/auth"
 
 	pb "github.com/gomsa/socialite/proto/miniprogram"
-	userPD "github.com/gomsa/socialite/proto/user"
+	userPB "github.com/gomsa/socialite/proto/user"
 	"github.com/gomsa/socialite/service"
 	"github.com/micro/go-micro/util/log"
 )
@@ -19,7 +22,7 @@ type Miniprogram struct {
 // Auth 小程序登录授权
 func (srv *Miniprogram) Auth(ctx context.Context, req *pb.Request, res *pb.Response) (err error) {
 	// 选择小程序驱动
-	srv.Mp, err = service.NewMiniprogram(req.Type)
+	err = srv.initMp(req.Type)
 	if err != nil {
 		log.Log(err)
 		return err
@@ -30,28 +33,55 @@ func (srv *Miniprogram) Auth(ctx context.Context, req *pb.Request, res *pb.Respo
 		log.Log(err)
 		return err
 	}
-	u := &userPD.User{
+	u := &userPB.User{
 		Origin:  req.Type,
 		Openid:  mp.Openid,
 		Session: mp.Session,
 	}
-	fmt.Println(u)
-	user := &userPD.User{}
+	err = srv.getUser(ctx, u)
+	if err != nil {
+		log.Log(err)
+		return err
+	}
+	// 获取 token
+	auth := &authSrvPB.User{
+		Id: u.Id,
+	}
+	token, err := client.Auth.AuthById(ctx, auth)
+	// 根据 id 去获取 token
+	res.Token = token.Token
+	res.Valid = token.Valid
+	return err
+}
+
+func (srv *Miniprogram) initMp(Type string) (err error){
+	// 选择小程序驱动
+	srv.Mp, err = service.NewMiniprogram(Type)
+	return err
+}
+
+func (srv *Miniprogram) getUser(ctx context.Context,u *userPB.User) (err error){
 	if srv.Repo.Exist(u) {
-		user, err = srv.Repo.Get(u)
+		// 获取 user
+		u, err = srv.Repo.Get(u)
 		if err != nil {
-			log.Log(err)
 			return err
 		}
 	} else {
-		user, err = srv.Repo.Create(u)
+		// 无用户先用过用户服务创建用户
+		user := &userSrvPB.User{
+			Origin:u.Origin,
+		}
+		userRes, err := client.User.Create(ctx, user)
 		if err != nil {
-			log.Log(err)
+			return err
+		}
+		u.Id = userRes.User.Id
+		// 创建社会用户
+		u, err = srv.Repo.Create(u)
+		if err != nil {
 			return err
 		}
 	}
-	// 根据 id 去获取 token
-	fmt.Println(user.Id)
-	fmt.Println(mp)
 	return err
 }

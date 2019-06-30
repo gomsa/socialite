@@ -24,6 +24,14 @@ github.com/golang/protobuf/ptypes/timestamp
 github.com/gomsa/tools/config
 github.com/gomsa/tools/env
 github.com/gomsa/tools/gorm
+github.com/gomsa/tools/k8s/client
+# github.com/gomsa/user-srv v0.0.0-20190630002335-b823887b550e
+github.com/gomsa/user-srv/client
+github.com/gomsa/user-srv/proto/auth
+github.com/gomsa/user-srv/proto/user
+github.com/gomsa/user-srv/proto/casbin
+github.com/gomsa/user-srv/proto/permission
+github.com/gomsa/user-srv/proto/role
 # github.com/google/btree v1.0.0
 github.com/google/btree
 # github.com/google/uuid v1.1.1
@@ -160,6 +168,8 @@ github.com/nats-io/nkeys
 github.com/nats-io/nuid
 # github.com/pkg/errors v0.8.1
 github.com/pkg/errors
+# github.com/satori/go.uuid v1.2.0
+github.com/satori/go.uuid
 # github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529
 github.com/sean-/seed
 # golang.org/x/crypto v0.0.0-20190618222545-ea8f1a30c443
