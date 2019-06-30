@@ -2,6 +2,8 @@ package hander
 
 import (
 	"context"
+	"math/rand"
+	"time"
 
 	"github.com/gomsa/user-srv/client"
 	userSrvPB "github.com/gomsa/user-srv/proto/user"
@@ -71,6 +73,7 @@ func (srv *Miniprogram) getUser(ctx context.Context,u *userPB.User) (err error){
 		// 无用户先用过用户服务创建用户
 		user := &userSrvPB.User{
 			Origin:u.Origin,
+			Password: srv.getRandomString(16),	// 密码默认为 16 位随机数
 		}
 		userRes, err := client.User.Create(ctx, user)
 		if err != nil {
@@ -84,4 +87,17 @@ func (srv *Miniprogram) getUser(ctx context.Context,u *userPB.User) (err error){
 		}
 	}
 	return err
+}
+
+
+// getRandomString 生成随机字符串
+func (srv *Miniprogram) getRandomString(length int64) string{
+   str := "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+   bytes := []byte(str)
+   result := []byte{}
+   r := rand.New(rand.NewSource(time.Now().UnixNano()))
+   for i := 0; int64(i) < length; i++ {
+      result = append(result, bytes[r.Intn(len(bytes))])
+   }
+   return string(result)
 }
