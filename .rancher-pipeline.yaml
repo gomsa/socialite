@@ -15,6 +15,18 @@ stages:
       dockerfilePath: ./rancher/Dockerfile
       buildContext: .
       tag: socialite:${CICD_EXECUTION_SEQUENCE}
+- name: Mariadb
+  steps:
+  - applyAppConfig:
+      catalogTemplate: cattle-global-data:library-mariadb
+      version: 5.0.9
+      answers:
+        db.name: socialite
+        db.user: socialite
+        service.type: ClusterIP
+        slave.replicas: "2"
+      name: socialite
+      targetNamespace: srv
 - name: Deploy
   steps:
   - applyYamlConfig:

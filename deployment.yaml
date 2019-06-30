@@ -42,10 +42,10 @@ spec:
             "--server_address=:8080",
           ]
           env:
-            - name: APP_KEY
-              value: "4RpKymtlXbizEQ8rOzHM3YybOrQuLya"
+            - name: USER_SRV_NAME
+              value: "user-srv.srv"
             - name: DB_HOST
-              value: "socialite-mariadb-mariadb"
+              value: "socialite-mariadb"
             - name: DB_USER
               value: "socialite"
             - name: DB_NAME
@@ -54,7 +54,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: mariadb-password
-                  name: socialite-mariadb-mariadb
+                  name: socialite-mariadb
           ports:
           - containerPort: 8080
             name: micro
