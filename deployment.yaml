@@ -51,8 +51,8 @@ spec:
             "--server_address=:8080",
           ]
           env:
-            - name: USER_SRV_NAME
-              value: "user-srv.srv"
+            - name: USER_NAME
+              value: "user.srv"
             - name: DB_HOST
               value: "socialite-mariadb"
             - name: DB_USER
