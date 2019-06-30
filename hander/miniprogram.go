@@ -5,9 +5,9 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/gomsa/user-srv/client"
-	userSrvPB "github.com/gomsa/user-srv/proto/user"
-	authSrvPB "github.com/gomsa/user-srv/proto/auth"
+	"github.com/gomsa/user/client"
+	userSrvPB "github.com/gomsa/user/proto/user"
+	authSrvPB "github.com/gomsa/user/proto/auth"
 
 	pb "github.com/gomsa/socialite/proto/miniprogram"
 	userPB "github.com/gomsa/socialite/proto/user"
