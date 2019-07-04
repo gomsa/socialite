@@ -50,6 +50,10 @@ func (srv *Miniprogram) Auth(ctx context.Context, req *pb.Request, res *pb.Respo
 		Id: u.Id,
 	}
 	token, err := client.Auth.AuthById(ctx, auth)
+	if err != nil {
+		log.Log(err)
+		return err
+	}
 	// 根据 id 去获取 token
 	res.Token = token.Token
 	res.Valid = token.Valid
