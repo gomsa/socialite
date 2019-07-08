@@ -12,11 +12,10 @@ import (
 
 //URepository 仓库接口
 type URepository interface {
+	GetByID(req *pb.User) ([]*pb.User, error)
 	Exist(user *pb.User) bool
 	Create(user *pb.User) (*pb.User, error)
 	Get(user *pb.User) (*pb.User, error)
-	List(req *pb.ListQuery) ([]*pb.User, error)
-	Total(req *pb.ListQuery) (int64, error)
 	Update(user *pb.User) (bool, error)
 	Delete(user *pb.User) (bool, error)
 }
@@ -24,6 +23,16 @@ type URepository interface {
 // UserRepository 用户仓库
 type UserRepository struct {
 	DB *gorm.DB
+}
+
+// GetByID 根据 id 获取绑定信息
+func (repo *UserRepository) GetByID(req *pb.User) (User []*pb.User, err error) {
+	if req.Id != "" {
+		if err := repo.DB.Model(&User).Where("id = ?", req.Id).Find(&User).Error; err != nil {
+			return nil, err
+		}
+	}
+	return User, nil
 }
 
 // Exist 检测用户是否已经存在
@@ -42,67 +51,6 @@ func (repo *UserRepository) Exist(user *pb.User) bool {
 		}
 	}
 	return false
-}
-
-// List 获取所有用户信息
-func (repo *UserRepository) List(req *pb.ListQuery) (users []*pb.User, err error) {
-	db := repo.DB
-	// 分页
-	var limit, offset int64
-	if req.Limit > 0 {
-		limit = req.Limit
-	} else {
-		limit = 10
-	}
-	if req.Page > 1 {
-		offset = (req.Page - 1) * limit
-	} else {
-		offset = -1
-	}
-
-	// 排序
-	var sort string
-	if req.Sort != "" {
-		sort = req.Sort
-	} else {
-		sort = "created_at desc"
-	}
-	// 查询条件
-	if req.Id != "" {
-		db = db.Where("id like ?", "%"+req.Id+"%")
-	}
-	if req.Openid != "" {
-		db = db.Where("openid like ?", "%"+req.Openid+"%")
-	}
-	if req.Session != "" {
-		db = db.Where("session like ?", "%"+req.Session+"%")
-	}
-	if err := db.Order(sort).Limit(limit).Offset(offset).Find(&users).Error; err != nil {
-		log.Log(err)
-		return nil, err
-	}
-	return users, nil
-}
-
-// Total 获取所有用户查询总量
-func (repo *UserRepository) Total(req *pb.ListQuery) (total int64, err error) {
-	users := []pb.User{}
-	db := repo.DB
-	// 查询条件
-	if req.Id != "" {
-		db = db.Where("id like ?", "%"+req.Id+"%")
-	}
-	if req.Openid != "" {
-		db = db.Where("openid like ?", "%"+req.Openid+"%")
-	}
-	if req.Session != "" {
-		db = db.Where("session like ?", "%"+req.Session+"%")
-	}
-	if err := db.Find(&users).Count(&total).Error; err != nil {
-		log.Log(err)
-		return total, err
-	}
-	return total, nil
 }
 
 // Get 获取用户信息

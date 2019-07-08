@@ -3,14 +3,8 @@ syntax = "proto3";
 package user;
 
 service Users {
-    // 获取用户列表
-    rpc List(ListQuery) returns (Response) {}
-    // 根据 唯一 获取用户
-    rpc Get(User) returns (Response) {}
-    // 创建用户
-    rpc Create(User) returns (Response) {}
-    // 更新用户
-    rpc Update(User) returns (Response) {}
+    // 获取用户绑定账号信息
+    rpc Build(User) returns (Response) {}
     // 删除用户
     rpc Delete(User) returns (Response) {}
     // 微服务之间调用
@@ -24,14 +18,7 @@ message User {
     string created_at = 5;
     string updated_at = 6;
 }
-message ListQuery{
-    int64 limit=1; //返回数量
-    int64 page=2; //页面
-    string sort=3; // 排序
-    string id = 4;
-    string openid = 5;
-    string session = 6;
-}
+
 message Request {
 }
 
